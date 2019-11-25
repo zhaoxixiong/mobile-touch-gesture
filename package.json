@@ -1,0 +1,24 @@
+{
+  "name": "mobile-touch-gesture",
+  "version": "1.0.0",
+  "description": "a mobile touch gesture library",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zhaoxixiong",
+  "keywords": [
+    "mobile-touch-gesture",
+    "mobile-touch",
+    "mobile-gesture",
+    "touch-gesture",
+    "gesture"
+  ],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhaoxixiong/mobile-touch-gesture.git"
+  },
+  "bugs": "https://github.com/zhaoxixiong/mobile-touch-gesture/issues",
+  "homepage": "https://github.com/zhaoxixiong/mobile-touch-gesture#readme"
+}
