@@ -2,8 +2,10 @@
   "name": "mobile-touch-gesture",
   "version": "1.0.0",
   "description": "a mobile touch gesture library",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "scripts": {
+    "compile": "babel -d dist/ src/",
+    "prepublish": "npm run compile",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "zhaoxixiong",
@@ -20,5 +22,9 @@
     "url": "https://github.com/zhaoxixiong/mobile-touch-gesture.git"
   },
   "bugs": "https://github.com/zhaoxixiong/mobile-touch-gesture/issues",
-  "homepage": "https://github.com/zhaoxixiong/mobile-touch-gesture#readme"
+  "homepage": "https://github.com/zhaoxixiong/mobile-touch-gesture#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
+  }
 }
