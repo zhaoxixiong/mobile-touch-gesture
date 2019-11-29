@@ -1,6 +1,6 @@
 {
   "name": "mobile-touch-gesture",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a mobile touch gesture library",
   "main": "./dist/index.js",
   "scripts": {
