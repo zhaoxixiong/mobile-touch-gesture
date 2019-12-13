@@ -8,7 +8,17 @@ This is a mobile touch gesture library.
 
 Gestures are supported below:
 
-swiperStart, swiperMove, swiperLeft，swiperRight,  swiperUp, swiperDown, swiperLeftRight, swiperRightLeft, swiperUpDown, swiperDownUp , tap, doubleTap, longTap.
+swiperStart, swiperMove, swiperLeft，swiperRight,  swiperUp, swiperDown, 
+
+swiperLeftRight, swiperLeftUp, swiperLeftDown,
+
+swiperRightLeft, swiperRightUp, swiperRightDown, 
+
+swiperUpDown, swiperUpLeft, swiperUpRight,
+
+swiperDownUp, swiperDownLeft ,swiperDownRight,
+
+ tap, doubleTap, longTap.
 
 ## Usage
 
@@ -47,16 +57,39 @@ const MTG = new MobileTouchGesture(document.documentElement || document.body, {
     swiperLeftRight() {
         console.log('swiperLeftRight')
     },
+    swiperLeftTop() {
+        console.log('swiperLeftTop')
+    },
+    swiperLeftDown() {
+        console.log('swiperLeftDown')
+    },
     swiperRightLeft() {
         console.log('swiperRightLeft')
+    },
+    swiperRightUp() {
+        console.log('swiperRightUp')
+    },
+    swiperRightDown() {
+        console.log('swiperRightDown')
     },
     swiperUpDown() {
         console.log('swiperUpDown')
     },
+    swiperUpLeft() {
+        console.log('swiperUpLeft')
+    },
+    swiperUpRight() {
+        console.log('swiperUpRight')
+    },
     swiperDownUp() {
         console.log('swiperDownUp')
     },
-
+    swiperDownLeft() {
+        console.log('swiperDownLeft')
+    },
+    swiperDownRight() {
+        console.log('swiperDownRight')
+    },
     tap(e) {
         console.log('tap')
     },
@@ -104,10 +137,18 @@ You can redefine time for long tap and double tap to trigger relative event.
 | swiperUp        | Function | function(){}           | slide up                 |
 | swiperDown      | Function | function(){}           | slide down               |
 | swiperLeftRight | Function | function(){}           | slide left then back     |
+| swiperLeftUp    | Function | function(){}           | slide left then up       |
+| swiperLeftDown  | Function | function(){}           | slide left then down     |
 | swiperRightLeft | Function | function(){}           | slide right then back    |
+| swiperRightUp   | Function | function(){}           | slide right then up      |
+| swiperRightDown | Function | function(){}           | slide right then down    |
 | swiperUpDown    | Function | function(){}           | slide up then back       |
-| swiperDownUp    | Function | function(){}           | slide up then back       |
-| tap             | Function | function(e){}          | click down then back     |
+| swiperUpRight   | Function | function(){}           | slide up then right      |
+| swiperUpLeft    | Function | function(){}           | slide up then left       |
+| swiperDownUp    | Function | function(){}           | slide down then back     |
+| swiperDownRight | Function | function(){}           | slide down then right    |
+| swiperDownLeft  | Function | function(){}           | slide down then left     |
+| tap             | Function | function(e){}          | click                    |
 | doubleTap       | Function | function(e){}          | double click             |
 | longTap         | Function | function(e){}          | long press               |
 | swiperStart     | Function | function(val){}        | trigger when touch start |
