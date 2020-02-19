@@ -9,18 +9,18 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /*
- * mobile touch gesture 1.0.2
+ * mobile touch gesture 1.0.3
  * https://github.com/zhaoxixiong/mobile-touch-gesture
  * Copyright (C) 2019 http://yunkus.com/ - a project by zhaoxixiong
  */
-; (function (global, factory) {
+;(function (global, factory) {
   (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : global.MobileTouchGesture = factory();
 })(this, function () {
   "use strict";
-  // const VERSION = "1.0.2"
+  // const VERSION = "1.0.3"
 
-  function noop() { }
-  var cbs = ['swiperStart', 'swiperMove', 'tap', 'doubleTap', 'longTap', 'swiperUp', 'swiperDown', 'swiperLeft', 'swiperRight', 'swiperUpDown', 'swiperUpRight', 'swiperUpLeft', 'swiperDownUp', 'swiperDownRight', 'swiperDownLeft', 'swiperLeftRight', 'swiperLeftUp', 'swiperLeftDown', 'swiperRightLeft', 'swiperRightUp', 'swiperRightDown'];
+  function noop() {}
+  var cbs = ['swiperStart', 'swiperMove', 'swiperEnd', 'tap', 'doubleTap', 'longTap', 'swiperUp', 'swiperDown', 'swiperLeft', 'swiperRight', 'swiperUpDown', 'swiperUpRight', 'swiperUpLeft', 'swiperDownUp', 'swiperDownRight', 'swiperDownLeft', 'swiperLeftRight', 'swiperLeftUp', 'swiperLeftDown', 'swiperRightLeft', 'swiperRightUp', 'swiperRightDown'];
   var ICONS = {
     UP: '<svg t="1574998974491" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5367" width="36" height="36"><path d="M553.173333 803.84h-64l0.021334-474.581333-224.021334 224-45.269333-45.226667L521.6 206.293333l301.717333 301.696-45.269333 45.269334-224.853333-224.896v475.477333z" p-id="5368" fill="#ffffff"></path></svg>',
     DOWN: '<svg t="1574998875412" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5214" width="36" height="36"><path d="M553.173333 238.314667h-64l0.021334 474.602666-224.021334-224-45.269333 45.226667L521.6 835.861333l301.717333-301.717333-45.269333-45.226667-224.853333 224.853334V238.336z" p-id="5215" fill="#ffffff"></path></svg>',
@@ -113,8 +113,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
     }
   };
+  function isMobileHandler() {
+    return (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)
+    );
+  }
   function isNumber(val) {
     return typeof val === 'number';
+  }
+  var ISMOBILE = isMobileHandler();
+  var platformKey = {
+    start: ISMOBILE ? 'touchstart' : 'mousedown',
+    move: ISMOBILE ? 'touchmove' : 'mousemove',
+    end: ISMOBILE ? 'touchend' : 'mouseup'
+  };
+  if (!ISMOBILE) {
+    platformKey.leave = 'mouseleave';
   }
   return function () {
     function MobileTouchGesture(el, options) {
@@ -161,9 +174,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this.tapTimer = null;
       this.longTapTimer = null;
       this.lastChange = null;
-      this.el.addEventListener('touchstart', this.start.bind(this));
-      this.el.addEventListener('touchmove', this.move.bind(this));
-      this.el.addEventListener('touchend', this.end.bind(this));
+
+      this.vmStart = this.start.bind(this);
+      this.vmMove = this.move.bind(this);
+      this.vmEnd = this.end.bind(this);
+
+      this.el.addEventListener(platformKey.start, this.vmStart);
+      if (ISMOBILE) {
+        this.el.addEventListener(platformKey.move, this.vmMove);
+        this.el.addEventListener(platformKey.end, this.vmEnd);
+      }
+
       // operation area
       this.winSize = {
         x: document.documentElement.clientWidth || document.body.clientWidth,
@@ -213,37 +234,45 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, this.options.longTapTime);
         // this.touchFingers = e.changedTouches
         // if one finger or not
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
+        if (ISMOBILE) {
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
 
-        try {
-          for (var _iterator2 = e.changedTouches[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var ct = _step2.value;
-
-            this.touchFingers.push({
-              pageX: Math.round(ct.pageX),
-              pageY: Math.round(ct.pageY)
-            });
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
           try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
+            for (var _iterator2 = e.changedTouches[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var ct = _step2.value;
+
+              this.touchFingers.push({
+                pageX: Math.round(ct.pageX),
+                pageY: Math.round(ct.pageY)
+              });
             }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
           } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
             }
           }
+        } else {
+          this.touchFingers.push(this.getPagePoint(e));
         }
-
         this.isOneFinger = this.touchFingers && this.touchFingers.length === 1;
         this.options.swiperStart(this.touchFingers[0]);
         this.gestures.oldPoint = [this.touchFingers[0].pageX, this.touchFingers[0].pageY];
+        if (!ISMOBILE) {
+          this.el.addEventListener(platformKey.move, this.vmMove);
+          this.el.addEventListener(platformKey.end, this.vmEnd);
+          this.el.addEventListener(platformKey.leave, this.vmEnd);
+        }
       }
     }, {
       key: 'move',
@@ -254,10 +283,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.showTip({ icon: '', text: this.options.prompt.nameMap.invalid });
           return;
         }
-        var touche = e.changedTouches[0];
+        var touche = this.getPagePoint(e);
         var _touchFingers$ = this.touchFingers[0],
-          pageX = _touchFingers$.pageX,
-          pageY = _touchFingers$.pageY;
+            pageX = _touchFingers$.pageX,
+            pageY = _touchFingers$.pageY;
 
         var currentPoint = [touche.pageX, touche.pageY];
         var dis = {
@@ -340,7 +369,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function end(e) {
         var _this2 = this;
 
+        if (!ISMOBILE) {
+          this.el.removeEventListener(platformKey.move, this.vmMove);
+          this.el.removeEventListener(platformKey.end, this.vmEnd);
+          this.el.removeEventListener(platformKey.leave, this.vmEnd);
+        }
         if (this.isOneFinger) {
+          var t = this.startTime - this.lastTime;
           this.lastChange = null;
           if (this.tips) {
             this.tips.style = this.tipStyle + "display:none";
@@ -359,9 +394,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (this.isLongTap) {
             clearTimeout(this.tapTimer);
             this.isLongTap = false;
+            this.initState();
             return;
           }
-          var t = this.startTime - this.lastTime;
+
           this.lastTime = this.startTime;
           if (0 < t && t < this.options.doubleTapTime) {
             clearTimeout(this.tapTimer);
@@ -372,12 +408,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.options['swiper' + tipsMaps[this.len][this.lastAxios.icons].name]();
         }
         // clear gesture data
-        this.touchFingers = [];
-        this.gestures.axios = [];
-        this.lastAxios = [];
-        this.len = 0;
-        this.type = 0;
-        this.direction = '';
+        this.initState();
       }
     }, {
       key: 'updateDate',
@@ -412,9 +443,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function destroy() {
         this.tapTimer && clearTimeout(this.tapTimer);
         this.longTapTimer && clearTimeout(this.longTapTimer);
-        this.el.removeEventListener('touchstart', this.start.bind(this));
-        this.el.removeEventListener('touchmove', this.move.bind(this));
-        this.el.removeEventListener('touchend', this.end.bind(this));
+        this.el.removeEventListener(platformKey.start, this.vmStart);
+        this.el.removeEventListener(platformKey.move, this.vmMove);
+        this.el.removeEventListener(platformKey.end, this.vmEnd);
+      }
+    }, {
+      key: 'getPagePoint',
+      value: function getPagePoint(e) {
+        return ISMOBILE ? e.changedTouches[0] : { pageX: e.pageX, pageY: e.pageY };
+      }
+    }, {
+      key: 'initState',
+      value: function initState() {
+        this.touchFingers = [];
+        this.gestures.axios = [];
+        this.lastAxios = [];
+        this.len = 0;
+        this.type = 0;
+        this.direction = '';
+        this.options.swiperEnd({ pageX: Math.round(this.gestures.oldPoint[0]), pageY: Math.round(this.gestures.oldPoint[1]) });
       }
     }]);
 

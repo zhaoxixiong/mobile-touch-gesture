@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>demo</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="../src/index.js"></script>
+	<style>
+			*{padding: 10px;margin: 0;}
+	#box{
+	
+		height: 200px;
+		width: 200px;
+		border: 1px solid red;
+	}
+	</style>
+</head>
+<body>
+	<div id="box"></div>
+<script>
+	const MTG = new MobileTouchGesture(document.querySelector('#box'), {
+	    // set tips text
+	    prompt: {
+	        nameMap: {
+	            swiperUp: 'Up!!!',
+	            swiperRight: 'Right!!!'
+	        }
+	    },
+	    // trigger function
+	    swiperStart(val) {
+	        console.log('swiperStart')
+	    },
+	    swiperMove(val1, val2) {
+	        console.log(val1, val2, 'swiperMove')
+	    },
+	    swiperEnd(val) {
+	        console.log(val,'swiperEnd')
+		},
+		doubleTap(){
+			console.log('doubleTap')
+		},
+		longTap(){
+			console.log('longTap')
+		}
+	})
+</script>
+</body>
+</html>

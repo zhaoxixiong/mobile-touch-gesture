@@ -1,5 +1,5 @@
 /*
- * mobile touch gesture 1.0.2
+ * mobile touch gesture 1.0.3
  * https://github.com/zhaoxixiong/mobile-touch-gesture
  * Copyright (C) 2019 http://yunkus.com/ - a project by zhaoxixiong
  */
@@ -9,10 +9,10 @@
       global.MobileTouchGesture = factory()
 }(this, (function () {
   "use strict";
-  // const VERSION = "1.0.2"
+  const VERSION = "1.0.3"
   function noop() { }
   const cbs = [
-    'swiperStart', 'swiperMove', 'tap', 'doubleTap', 'longTap',
+    'swiperStart', 'swiperMove', 'swiperEnd', 'tap', 'doubleTap', 'longTap',
     'swiperUp', 'swiperDown', 'swiperLeft', 'swiperRight',
     'swiperUpDown', 'swiperUpRight', 'swiperUpLeft',
     'swiperDownUp', 'swiperDownRight', 'swiperDownLeft',
@@ -111,11 +111,24 @@
       }
     }
   }
+  function isMobileHandler(){
+    return (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent))
+  }
   function isNumber(val) {
     return typeof val === 'number'
   }
+  const ISMOBILE = isMobileHandler()
+  const platformKey = {
+    start: ISMOBILE ? 'touchstart' : 'mousedown',
+    move: ISMOBILE ? 'touchmove' : 'mousemove',
+    end: ISMOBILE ? 'touchend' : 'mouseup'
+  }
+  if(!ISMOBILE){
+    platformKey.leave = 'mouseleave'
+  }
   return class MobileTouchGesture {
     constructor(el, options) {
+      this._version = VERSION
       this.el = el
       this.options = options
       // if not set function, use default function
@@ -135,9 +148,17 @@
       this.tapTimer = null
       this.longTapTimer = null
       this.lastChange = null
-      this.el.addEventListener('touchstart', this.start.bind(this))
-      this.el.addEventListener('touchmove', this.move.bind(this))
-      this.el.addEventListener('touchend', this.end.bind(this))
+
+      this.vmStart = this.start.bind(this)
+      this.vmMove = this.move.bind(this)
+      this.vmEnd = this.end.bind(this)
+
+      this.el.addEventListener(platformKey.start, this.vmStart)
+      if(ISMOBILE){
+        this.el.addEventListener(platformKey.move, this.vmMove)
+        this.el.addEventListener(platformKey.end, this.vmEnd)
+      }
+     
       // operation area
       this.winSize = {
         x: document.documentElement.clientWidth || document.body.clientWidth,
@@ -182,15 +203,24 @@
       }, this.options.longTapTime);
       // this.touchFingers = e.changedTouches
       // if one finger or not
-      for (let ct of e.changedTouches) {
-        this.touchFingers.push({
-          pageX: Math.round(ct.pageX),
-          pageY: Math.round(ct.pageY)
-        })
+      if(ISMOBILE){
+        for (let ct of e.changedTouches) {
+          this.touchFingers.push({
+            pageX: Math.round(ct.pageX),
+            pageY: Math.round(ct.pageY)
+          })
+        }
+      }else{
+        this.touchFingers.push(this.getPagePoint(e))
       }
       this.isOneFinger = this.touchFingers && this.touchFingers.length === 1
       this.options.swiperStart(this.touchFingers[0])
       this.gestures.oldPoint = [this.touchFingers[0].pageX, this.touchFingers[0].pageY]
+      if(!ISMOBILE){
+        this.el.addEventListener(platformKey.move, this.vmMove)
+        this.el.addEventListener(platformKey.end, this.vmEnd)
+        this.el.addEventListener(platformKey.leave, this.vmEnd)
+      }
     }
     move(e) {
       clearTimeout(this.longTapTimer)
@@ -199,7 +229,7 @@
         this.showTip({ icon: '', text: this.options.prompt.nameMap.invalid })
         return
       }
-      const touche = e.changedTouches[0]
+      const touche = this.getPagePoint(e)
       const { pageX, pageY } = this.touchFingers[0]
       const currentPoint = [touche.pageX, touche.pageY]
       const dis = {
@@ -277,7 +307,13 @@
 
     }
     end(e) {
+      if(!ISMOBILE){
+        this.el.removeEventListener(platformKey.move, this.vmMove)
+        this.el.removeEventListener(platformKey.end, this.vmEnd)
+        this.el.removeEventListener(platformKey.leave, this.vmEnd)
+      }
       if (this.isOneFinger) {
+        const t = this.startTime - this.lastTime
         this.lastChange = null
         if (this.tips) {
           this.tips.style = this.tipStyle + "display:none"
@@ -296,9 +332,10 @@
         if (this.isLongTap) {
           clearTimeout(this.tapTimer)
           this.isLongTap = false;
+          this.initState()
           return;
         }
-        const t = this.startTime - this.lastTime
+        
         this.lastTime = this.startTime
         if (0 < t && t < this.options.doubleTapTime) {
           clearTimeout(this.tapTimer)
@@ -309,12 +346,7 @@
         this.options['swiper' + tipsMaps[this.len][this.lastAxios.icons].name]()
       }
       // clear gesture data
-      this.touchFingers = []
-      this.gestures.axios = []
-      this.lastAxios = []
-      this.len = 0
-      this.type = 0
-      this.direction = ''
+     this.initState()
     }
     updateDate() {
       this.len = this.gestures.axios.length
@@ -341,9 +373,21 @@
     destroy() {
       this.tapTimer && clearTimeout(this.tapTimer)
       this.longTapTimer && clearTimeout(this.longTapTimer)
-      this.el.removeEventListener('touchstart', this.start.bind(this))
-      this.el.removeEventListener('touchmove', this.move.bind(this))
-      this.el.removeEventListener('touchend', this.end.bind(this))
+      this.el.removeEventListener(platformKey.start, this.vmStart)
+      this.el.removeEventListener(platformKey.move, this.vmMove)
+      this.el.removeEventListener(platformKey.end, this.vmEnd)
+    }
+    getPagePoint(e){
+      return ISMOBILE ? e.changedTouches[0] : {pageX: e.pageX, pageY: e.pageY}
+    }
+    initState(){
+      this.touchFingers = []
+      this.gestures.axios = []
+      this.lastAxios = []
+      this.len = 0
+      this.type = 0
+      this.direction = ''
+      this.options.swiperEnd({pageX: Math.round(this.gestures.oldPoint[0]), pageY: Math.round(this.gestures.oldPoint[1])})
     }
   }
 })))

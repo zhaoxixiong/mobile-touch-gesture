@@ -1,14 +1,16 @@
 # mobile-touch-gesture
 
+current version 1.0.3
+
 ## Foreword
 
-This is a mobile touch gesture library.
+This is a mobile touch gesture and pc mouse gesture library.
 
 ## Feature
 
 Gestures are supported below:
 
-swiperStart, swiperMove, swiperLeft，swiperRight,  swiperUp, swiperDown, 
+swiperStart, swiperMove, swiperEnd, swiperLeft，swiperRight,  swiperUp, swiperDown, 
 
 swiperLeftRight, swiperLeftUp, swiperLeftDown,
 
@@ -41,6 +43,9 @@ const MTG = new MobileTouchGesture(document.documentElement || document.body, {
     },
     swiperMove(val1, val2) {
         console.log(val1, val2)
+    },
+    swiperEnd(val) {
+        console.log(val)
     },
     swiperLeft() {
         console.log('swiperLeft')
@@ -153,6 +158,7 @@ You can redefine time for long tap and double tap to trigger relative event.
 | longTap         | Function | function(e){}          | long press               |
 | swiperStart     | Function | function(val){}        | trigger when touch start |
 | swiperMove      | Function | function(val1, val2){} | trigger when move start  |
+| swiperEnd       | Function | function(val1, val2){} | trigger when move end    |
 
 ## 中文文档
 
