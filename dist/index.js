@@ -17,8 +17,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : global.MobileTouchGesture = factory();
 })(this, function () {
   "use strict";
-  // const VERSION = "1.0.3"
 
+  var VERSION = "1.0.3";
   function noop() {}
   var cbs = ['swiperStart', 'swiperMove', 'swiperEnd', 'tap', 'doubleTap', 'longTap', 'swiperUp', 'swiperDown', 'swiperLeft', 'swiperRight', 'swiperUpDown', 'swiperUpRight', 'swiperUpLeft', 'swiperDownUp', 'swiperDownRight', 'swiperDownLeft', 'swiperLeftRight', 'swiperLeftUp', 'swiperLeftDown', 'swiperRightLeft', 'swiperRightUp', 'swiperRightDown'];
   var ICONS = {
@@ -133,6 +133,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     function MobileTouchGesture(el, options) {
       _classCallCheck(this, MobileTouchGesture);
 
+      this._version = VERSION;
       this.el = el;
       this.options = options;
       // if not set function, use default function
